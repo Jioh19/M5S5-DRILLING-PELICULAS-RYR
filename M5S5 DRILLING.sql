@@ -32,7 +32,7 @@ CREATE TABLE reparto (
 -- año de estreno, director y todo el reparto.
 SELECT p.pelicula, p.estreno, p.director, r.actor 
     FROM peliculas AS p, reparto AS r 
-        WHERE pelicula = 'Titanic' 
+        WHERE pelicula LIKE '%Titanic%'
             AND p.id = r.id_pelicula;
 
 -- 8. Listar los 10 directores más populares, indicando su nombre y cuántas películas aparecen
@@ -55,11 +55,19 @@ SELECT pelicula, estreno
             ORDER BY estreno ASC;
 
 -- 11. Listar los actores de la película más nueva.
+--! Habia usado subconsultas sin saber que eran las subconsultas
+-- SELECT r.actor, p.estreno, p.pelicula
+--     FROM reparto AS r, peliculas AS p
+--         WHERE p.estreno = (
+--             SELECT MAX(estreno) FROM peliculas) AND r.id_pelicula = p.id
+--             ORDER BY p.pelicula ASC;
+
 SELECT r.actor, p.estreno, p.pelicula
     FROM reparto AS r, peliculas AS p
-        WHERE p.estreno = (
-            SELECT MAX(estreno) FROM peliculas) AND r.id_pelicula = p.id
-            ORDER BY p.pelicula ASC;
+        WHERE p.id = r.id_pelicula 
+        ORDER BY (estreno, pelicula) DESC
+        LIMIT 30
+
 
 -- 12. Inserte los datos de una nueva película solo en memoria, y otra película en el disco duro.
 BEGIN TRANSACTION;
@@ -101,6 +109,8 @@ DELETE FROM peliculas
 ROLLBACK;
 
 -- 16. Inserte 2 actores para cada película estrenada el 2001.
+--! Se que es una subconsulta, pero es material que en su momento me dio la profe en clases,
+--! y en su momento me sentí orgulloso por haberlo logrado :(
 BEGIN TRANSACTION;
 INSERT INTO reparto (id_pelicula, actor)
 	SELECT id, 'Juan Oh1'
